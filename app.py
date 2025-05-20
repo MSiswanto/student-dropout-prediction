@@ -5,17 +5,30 @@ import numpy as np
 # Load model
 model = joblib.load("dropout_model.pkl")
 
-st.title("Prediksi Mahasiswa Dropout")
+# Judul Aplikasi
+st.set_page_config(page_title="Prediksi Dropout Mahasiswa", page_icon="🎓")
+st.title("🎓 Prediksi Dropout Mahasiswa")
+st.markdown("""
+Aplikasi ini memprediksi apakah seorang mahasiswa berisiko Dropout, Masih Enrolled, atau Graduate.
+Silakan masukkan data di bawah ini untuk melihat prediksi:
+""")
 
-# Input fitur
-age = st.slider("Umur saat mendaftar", 17, 50, 20)
-admission_grade = st.slider("Nilai masuk", 0.0, 200.0, 120.0)
-curr_units_grade = st.slider("Rata-rata nilai semester 1", 0.0, 20.0, 12.0)
-# Tambahkan fitur lain
+# Sidebar untuk input
+st.sidebar.header("Input Data Mahasiswa")
 
-if st.button("Prediksi"):
-    features = np.array([[age, admission_grade, curr_units_grade]])  # sesuaikan urutan
-    pred = model.predict(features)
+umur = st.sidebar.slider("Umur saat mendaftar", 17, 50, 20)
+nilai_masuk = st.sidebar.slider("Nilai masuk", 0.00, 200.00, 120.0)
+rata_rata_smt1 = st.sidebar.slider("Rata-rata nilai semester 1", 0.00, 20.00, 12.0)
+rata_rata_smt2 = st.sidebar.slider("Rata-rata nilai semester 2", 0.00, 20.00, 12.0)
+jumlah_mk_tdk_lulus = st.sidebar.slider("Jumlah MK tidak lulus", 0, 20, 3)
 
-    label_map = {0: 'Dropout', 1: 'Enrolled', 2: 'Graduate'}
-    st.success(f"Prediksi: {label_map[pred[0]]}")
+# Prediksi
+if st.button("🔍 Prediksi"):
+    input_data = np.array([[umur, nilai_masuk, rata_rata_smt1, rata_rata_smt2, jumlah_mk_tdk_lulus]])
+    prediction = model.predict(input_data)[0]
+    label = {0: "Dropout", 1: "Enrolled", 2: "Graduate"}
+
+    st.success(f"📢 Hasil Prediksi: **{label[prediction]}**")
+
+    if prediction == 0:
+        st.warning("⚠️ Mahasiswa ini berisiko tinggi untuk Dropout. Pertimbangkan untuk memberi bimbingan khusus.")
